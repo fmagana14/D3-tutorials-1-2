@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+</head>
+<body>
+    <!-- <div> </div> -->
+<script src="https://cdn.jsdelivr.net/npm/d3@7"></script>
+  <script>
+            // challenge 1
+    // makes array of Random Nums
+    function randomNums(count, maxValue){
+        return Array.from({length: count}, () => Math.random()*maxValue);
+    }
+
+    function normalizeValue(data){
+        const max = Math.max(...data);
+        return data.map(d => d / max * 10);
+    }
+
+    const randomData = randomNums(20, 20);
+    const normalizeData = normalizeValue(randomData);
+
+    console.log('Original Data:', randomData);
+    console.log('Normalize Data:', normalizeData);
+
+    d3.select('body')
+    .selectAll('div')
+    .data(normalizeData)
+    .enter() // enter the data
+    .append('div')
+    .text((d) => `$${d.toFixed(2)}`)
+    // challenge 2
+    .style('padding', '1em') // padding: 1em
+    .style('background-image', 'linear-gradient(to left, #e66465, #9198e5)') // background-color: red
+    .style('margin', '1px') // margin: 1px
+    .style('width', (d) => `${d / 10 * 100}%`) // set width based on data
+    .style('color', '#fff')
+    .style('font-family', 'helvetica')
+    .style('font-size', (d) => '${d * 5}px')
+    .style('color', (d) => 'hsl(d / 10 * 360, 100%, 50%)')
+
+  </script>
+</body>
+</html>
