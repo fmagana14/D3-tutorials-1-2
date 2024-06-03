@@ -29,14 +29,15 @@
 d3.select('#svg')
   .style('border', '1px solid')
   // select all <circle>s in #svg
-  .selectAll('circle')
+  .selectAll('ellipse')
   .data(data) // add some data
   .enter() // enter the data
-  .append('circle') // append some circles
+  .append('ellipse') // append some circles
   // Set attributes for SVG circles
   .attr('cx', (d, i) => i * 800 / data.length)
   .attr('cy', d => d.a * 600)
-  .attr('r', d => d.c * 80)
+  .attr('rx', d => d.b * 50)
+  .attr('ry', d => d.c * 50)
   .attr('fill', d => 'purple')
   .attr('opacity', () => 0.7)
   .attr('stroke', '#0000ff')
