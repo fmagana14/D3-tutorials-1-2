@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+</head>
+<body>
+  <svg id="svg" width="800" height="800">
+    <circle cx="250" cy="250" r="123" fill="#0ff"/>
+    <circle cx="540" cy="500" r="34" fill="blue"/>
+    <circle cx="150" cy="150" r="55" fill="red"/>
+    <circle cx="540" cy="339" r="120" fill="green"/>
+    </svg>
+	
+  <script src="https://cdn.jsdelivr.net/npm/d3@7"></script>
+  <script>
+    // Your code here
+    function makeRandomData(n) {
+  const array = []
+  for (let i = 0; i < n; i += 1) {
+    array.push({ a: Math.random(), b: Math.random(), c: Math.random() })
+  }
+  return array
+}
+  const data = makeRandomData(11)
+
+d3.select('#svg')
+  .style('border', '1px solid')
+  // select all <circle>s in #svg
+  .selectAll('circle')
+  .data(data) // add some data
+  .enter() // enter the data
+  .append('circle') // append some circles
+  // Set attributes for SVG circles
+  .attr('cx', (d, i) => i * 800 / data.length)
+  .attr('cy', d => d.a * 600)
+  .attr('r', d => d.c * 80)
+  .attr('fill', d => 'purple')
+  .attr('opacity', () => 0.7)
+  .attr('stroke', '#0000ff')
+  .attr('stroke-width', d => 8 * d.b)
+  </script>
+</body>
+</html>
