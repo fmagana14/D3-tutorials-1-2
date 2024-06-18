@@ -1,48 +1,106 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Document</title>
-</head>
-<body>
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+  <body>
+    <svg id="svg" width="800" height="500">
+      <g>
+        <!--Group 1 -->
+        <circle></circle>
+        <text></text>
+      </g>
+      <g>
+        <!--Group 2 -->
+        <circle></circle>
+        <text></text>
+      </g>
+    </svg>
 
-  <svg id="svg" width="500" height="500"></svg>
+    <script src="https://cdn.jsdelivr.net/npm/d3@7"></script>
+    <script>
+      // Your Script here...
+      d3.csv("cities.csv").then((data) => {
+        data.forEach((city) => {
+          city.population = parseInt(city.population);
+        });
+        const minX = d3.min(data, (d) => parseFloat(d.x));
+        const maxX = d3.max(data, (d) => parseFloat(d.x));
+        const minY = d3.min(data, (d) => parseFloat(d.y));
+        const maxY = d3.max(data, (d) => parseFloat(d.y));
+        // create a linear scale
+        console.log("min", minX, "max", maxX);
+        const xScale = d3
+          .scaleLinear()
+          .domain([minX - 50, maxX + 50]) // Use the min and max values
+          .range([100, 700]); // Set the range
 
-  <script src="https://cdn.jsdelivr.net/npm/d3@7"></script>
-  <script>
-    // Your Script here...
-    d3.csv('cities.csv')
-    .then(data => {
+        console.log("min", minY, "max", maxY);
+        const yScale = d3
+          .scaleLinear()
+          .domain([minY - 50, maxY + 100]) // Use the min and max values
+          .range([100, 400]);
+
+        const countries = Array.from(new Set(data.map((d) => d.country)));
+
+        const popScale = d3
+          .scaleSqrt()
+          .domain(d3.extent(data, (d) => d.population))
+          .range([20, 190]);
+
+        const countryScale = d3
+          .scaleOrdinal()
+          .domain(countries) // Use the list counties here
+          .range(["cornflowerblue", "gold", "gold", "tomato"]);
+
         // console.log(data)
-        d3.select('#svg')
-        .style('border', '1px solid')
-        .style('background-color', '#F597EE')
-        .selectAll('circle')
-        .data(data)
-        .enter()
-        .append('circle')
-        .attr('cx', d => parseFloat(d.x) * 2 + 220)
-        .attr('cy', d => parseFloat(d.y) * 2 + 220)
-        .attr('r', 20)
-        .attr('fill',  'blue')
-        .attr('opacity', 0.25)
-        .attr('r', d => parseInt(d.population) * 0.00001)
-        .attr('fill', d => {
-            if (d.country === 'USA') {
-                return 'cornflowerblue'
-            } else if (d.country === 'Pakistan') {
-                return 'gold'
-            } else if (d.country === 'Italy') {
-                return 'green'
-            } else if (d.country === 'Brazil') {
-                return 'tomato'
-            }
-            })
-        .attr('fill', (d, i) => `hsl(${360 / data.length * i}, 100%, 70%)`)
-    
-    })
-  </script>
-</body>
+        const node = d3
+          .select("#svg")
+          .style("border", "1px solid")
+          .style("background-color", "#F597EE")
+          .selectAll("g")
+          .data(data)
+          .enter();
+        // For each of those groups
+
+        const groups = node.append("g");
+        // add a circle
+        groups
+          .append("circle")
+          .attr("cx", (d) => xScale(d.x))
+          .attr("cy", (d) => yScale(d.y))
+          .attr("r", (d) => popScale(d.population))
+          .attr("fill", `red`)
+          .attr("opacity", 0.25)
+          .attr("fill", (d) => countryScale(d.country));
+
+        groups
+          .append("text")
+          .text((d) => d.label) // set the text
+          .attr("x", (d) => xScale(d.x) + Math.cos(Math.PI * 1.75))
+          .attr("y", (d) => yScale(d.y * 2 + 0))
+          .style("font-family", "Helvetica")
+          .style("font-size", "18px")
+        //   .append("circle")
+        //   .attr("cx", (d) => parseFloat(d.x) * 2 + 220)
+        //   .attr("cy", (d) => parseFloat(d.y) * 2 + 220)
+        //   .attr("cx", (d) => xScale(d.x)) // scale x with xScale
+        //   .attr("cx", (d) => xScale(d.y)) // scale y with yScale
+        //   .attr("r", 20)
+        //   .attr("fill", "blue")
+        //   .attr("opacity", 0.35)
+
+        //   .attr("fill", (d) => countryScale(d.country)) //country color
+
+        //   .attr("r", (d) => popScale(d.population))
+
+        //   .attr("fill", (d, i) => `hsl(${(360 / data.length) * i}, 100%, 70%)`);
+      });
+    </script>
+  </body>
 </html>
+
+<!-- having issues with scaleSqrt need help -->
