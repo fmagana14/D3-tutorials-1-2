@@ -77,27 +77,70 @@
           .attr("opacity", 0.25)
           .attr("fill", (d) => countryScale(d.country));
 
+        const angle = Math.PI * 1.75;
+        // Text
         groups
           .append("text")
           .text((d) => d.label) // set the text
-          .attr("x", (d) => xScale(d.x) + Math.cos(Math.PI * 1.75))
-          .attr("y", (d) => yScale(d.y * 2 + 0))
+          .attr(
+            "x",
+            (d) => xScale(d.x) + Math.cos(angle) * popScale(d.population)
+          )
+          .attr(
+            "y",
+            (d) => yScale(d.y) + Math.sin(angle) * popScale(d.population)
+          )
           .style("font-family", "Helvetica")
-          .style("font-size", "18px")
-        //   .append("circle")
-        //   .attr("cx", (d) => parseFloat(d.x) * 2 + 220)
-        //   .attr("cy", (d) => parseFloat(d.y) * 2 + 220)
-        //   .attr("cx", (d) => xScale(d.x)) // scale x with xScale
-        //   .attr("cx", (d) => xScale(d.y)) // scale y with yScale
-        //   .attr("r", 20)
-        //   .attr("fill", "blue")
-        //   .attr("opacity", 0.35)
+          .style("font-size", "18px");
 
-        //   .attr("fill", (d) => countryScale(d.country)) //country color
+        // calculate the angle
 
-        //   .attr("r", (d) => popScale(d.population))
+        // append some lines
+        groups
+          .append("line")
+          .attr("x1", (d) => xScale(d.x))
+          .attr("y1", (d) => yScale(d.y))
+          .attr(
+            "x2",
+            (d) => xScale(d.x) + Math.cos(angle) * popScale(d.population)
+          )
+          .attr(
+            "y2",
+            (d) => yScale(d.y) + Math.sin(angle) * popScale(d.population)
+          )
+          .attr("stroke", "#fff");
+        // line 2
+        groups
+          .append("line")
+          .attr(
+            "x1",
+            (d) => xScale(d.x) + Math.cos(angle) * popScale(d.population)
+          )
+          .attr(
+            "y1",
+            (d) => yScale(d.y) + Math.sin(angle) * popScale(d.population)
+          )
+          .attr(
+            "x2",
+            (d) => xScale(d.x) + Math.cos(angle) * popScale(d.population) + 100
+          )
+          .attr(
+            "y2",
+            (d) => yScale(d.y) + Math.sin(angle) * popScale(d.population)
+          )
+          .attr("stroke", "#fff");
 
-        //   .attr("fill", (d, i) => `hsl(${(360 / data.length) * i}, 100%, 70%)`);
+   // SideLables
+        groups
+          .append("text")
+          .text((d) => d.label) // set the text
+          .attr("x",30)
+          .attr("y", (d, i) => {
+            return 500 - 20 * i
+          })
+          .style("font-family", "Helvetica")
+          .style("font-size", "18px");
+
       });
     </script>
   </body>
