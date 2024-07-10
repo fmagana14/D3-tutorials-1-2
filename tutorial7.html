@@ -6,6 +6,13 @@
   <body>
     <svg id="svg" width="600" height="400"></svg>
 
+    <svg>
+      <g><path m="..."></path></g>
+      <g>...</g><!-- date axis -->
+      <g>...</g><!-- rainfall axis -->
+    </svg>
+
+
     <script src="https://cdn.jsdelivr.net/npm/d3@7"></script>
     <style>
       /* Put the box in the center of the page */
@@ -22,34 +29,69 @@
       }
     </style>
     <script>
-
-
+  
       function handleData(data) {
+        const width = 600;
+        const height = 500;
+        const margin = 40;
         // draw stuff here
-        const baData = getDataForState(data, "BA");
+        const baData = getDataForState(data, "SE");
+        // Dates are formatted: 30/11/2017
+        const parseTime = d3.timeParse("%d/%m/%Y");
+        // parse the dates for d3
+        baData.forEach((d) => (d.date = parseTime(d.date)));
+        // Find the extents of the dates
+        const dateExtent = d3.extent(baData, d => d.date)
         // x scale
         const xscale = d3
-          .scaleLinear()
-          .domain([0, baData.length]) // number of values
-          .range([40, 560]); // changed range
-        // y-axis
+          .scaleTime() // Make a time scale!
+          .domain(dateExtent)
+          .range([margin, width - margin]) // Use the width and margin!
+          .nice(); // Rounds the scale "nicely"
         const percipitationExtents = d3.extent(baData, (d) => d.precipitation);
-        const yscale = d3
-          .scaleLinear()
+
+        const yscale = d3.scaleLinear()
           .domain(percipitationExtents)
-          .range([40, 360]); //changed range
+          .range([height - margin, margin]) // Use the margin and height here
 
         // blue line generator
-        const linegen = d3
-          .line() // create a line generator
-          .x((d, i) => xscale(i)) // map the x to the index
-          .y((d) => yscale(d.precipitation)) // map y to percipitation
-          .curve(d3.curveLinear); // apply a curve type
+        // line generator
+        const linegen = d3.line()
+          .x(d => xscale(d.date)) // Use date here! 
+          .y(d => yscale(d.precipitation))
+          .curve(d3.curveLinear)
+
+                // Draw something on our svg
+        const svg = d3
+          .select('#svg')
+         // ends here nothing after .select()!
+          // Make a group for the graph
+
+        const graph = svg
+          .append('g')
+        
+                // This makes generator.
+        const bottomAxis = d3.axisBottom(xscale)
+        const leftAxis = d3.axisLeft(yscale)
+        
+        // Use the group to append the path and generate a line.
+        graph
+          .append('path')
+          .attr('d', linegen(baData))
+          .attr('stroke-width', 3)
+          .attr('stroke', 'cornflowerblue')
+          .attr('fill', 'none')
+// Append the group and add the left axis
+        svg
+          .append('g')
+          .attr('transform', `translate(${margin}, 0)`)
+          .call(leftAxis)
+
 
         d3.select("#svg")
           .append("path") // append a path
           .attr("d", linegen(baData)) // generate a line
-          .attr("stroke-width", 5) //changed width 
+          .attr("stroke-width", 5) //changed width
           .attr("stroke", "cornflowerblue")
           .attr("fill", "none");
       }
@@ -58,34 +100,64 @@
       d3.csv("precipitation.csv").then(lineData);
 
       function lineData(data) {
+        const width = 600;
+        const height = 500;
+        const margin = 40;
         // draw stuff here
-        const baData = getDataForState(data, "SE");
+        const baData = getDataForState(data, "BA");
+        // Dates are formatted: 30/11/2017
+        const parseTime = d3.timeParse("%d/%m/%Y");
+        // parse the dates for d3
+        baData.forEach((d) => (d.date = parseTime(d.date)));
+        // Find the extents of the dates
+        const dateExtent = d3.extent(baData, d => d.date)
         // x scale
         const xscale = d3
-          .scaleLinear()
-          .domain([0, baData.length]) // number of values
-          .range([40, 560]); // changed range
-        // y-axis
+          .scaleTime() // Make a time scale!
+          .domain(dateExtent)
+          .range([margin, width - margin]) // Use the width and margin!
+          .nice(); // Rounds the scale "nicely"
         const percipitationExtents = d3.extent(baData, (d) => d.precipitation);
-        const yscale = d3
-          .scaleLinear()
-          .domain(percipitationExtents)
-          .range([40, 360]); //changed range
 
-        // red line generator 
-        const linegen = d3
-          .line() // create a line generator
-          .x((d, i) => xscale(i)) // map the x to the index
-          .y((d) => yscale(d.precipitation)) // map y to percipitation
-          .curve(d3.curveLinear); // apply a curve type
+        const yscale = d3.scaleLinear()
+          .domain(percipitationExtents)
+          .range([height - margin, margin]) // Use the margin and height here
+
+        // blue line generator
+        // line generator
+        const linegen = d3.line()
+          .x(d => xscale(d.date)) // Use date here!
+          .y(d => yscale(d.precipitation))
+          .curve(d3.curveLinear)
+
+        // Draw something on our svg
+        const svg = d3
+          .select('#svg')
+        // ends here nothing after .select()!
+          // Make a group for the graph
+
+        const graph = svg
+          .append('g')
+
+        // This makes generator.
+        const bottomAxis = d3.axisBottom(xscale)
+        
+        // Use the group to append the path and generate a line.
+        graph
+          .append('path')
+          .attr('d', linegen(baData))
+          .attr('stroke-width', 1)
+          .attr('stroke', 'cornflowerblue')
+          .attr('fill', 'none')
 
         d3.select("#svg")
           .append("path") // append a path
           .attr("d", linegen(baData)) // generate a line
-          .attr("stroke-width", 2)
+          .attr("stroke-width", 2) //changed width
           .attr("stroke", "red")
           .attr("fill", "none");
       }
+
 
       function getDataForState(data, state) {
         const arr = data
